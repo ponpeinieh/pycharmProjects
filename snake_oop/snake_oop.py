@@ -5,10 +5,11 @@ import random
 
 class App:
     blue = (0, 0, 255)
+    yellow = (255, 255, 0)
     green = (0, 255, 0)
     red = (255, 0, 0)
-    white = (255, 255, 255)
-    snake_block = 20
+    black = (0, 0, 0)
+    snake_block = 10
     snake_speed = 5
 
     def __init__(self):
@@ -25,6 +26,7 @@ class App:
         self.foody = 0
         self.clock = None
         self.snake_list = None
+        self.score = 0
         self.snake_length = 0
 
     def on_init(self):
@@ -41,6 +43,7 @@ class App:
         self.game_over = False
         self.next_random_food()
         self.snake_list = []
+        self.score = 0
         self.snake_length = 1
         return True
 
@@ -52,6 +55,7 @@ class App:
         self.game_over = False
         self.next_random_food()
         self.snake_list = []
+        self.score = 0
         self.snake_length = 1
 
     def on_event(self, event):
@@ -70,6 +74,14 @@ class App:
             elif event.key == pygame.K_DOWN:
                 self.y_change = App.snake_block
                 self.x_change = 0
+            elif event.key == pygame.K_a:
+                App.snake_speed += 5
+                if App.snake_speed > 60:
+                    App.snake_speed = 60
+            elif event.key == pygame.K_s:
+                App.snake_speed -= 5
+                if App.snake_speed <= 0:
+                    App.snake_speed = 1
             if self.game_over:
                 if event.key == pygame.K_q:
                     self.running = False
@@ -88,17 +100,20 @@ class App:
                 # print("Yummy!!")
                 self.next_random_food()
                 self.snake_length += 1
+                self.score += 1
             if self.x >= self.screen_width or self.x < 0 or self.y >= self.screen_height or self.y < 0:
                 self.game_over = True
             if self.hit_itself():
                 self.game_over = True
 
     def on_render(self):
-        self.screen.fill(App.white)
+        self.screen.fill(App.black)
         pygame.draw.rect(self.screen, App.red, (self.foodx, self.foody, App.snake_block, App.snake_block))
         self.draw_snake(App.blue, App.green)
+        self.message(f"Score : {self.score}", App.green, 100, 50)
+        self.message(f"Speed : {self.snake_speed}", App.yellow, 100, 100)
         if self.game_over:
-            self.message("Game Over!(按Q 結束游戲 或 按R 重新開始)", App.red)
+            self.message("Game Over!(按Q 結束游戲 或 按R 重新開始)", App.red, self.screen_width // 2, self.screen_height // 2)
         pygame.display.update()
         self.clock.tick(App.snake_speed)
 
@@ -117,9 +132,9 @@ class App:
             self.on_render()
         self.on_cleanup()
 
-    def message(self, msg, color):
+    def message(self, msg, color, x, y):
         mesg = self.font.render(msg, True, color)
-        mesg_rect = mesg.get_rect(center=(self.screen_width // 2, self.screen_height // 2))
+        mesg_rect = mesg.get_rect(center=(x, y))
         self.screen.blit(mesg, mesg_rect)
 
     def next_random_food(self):
