@@ -79,17 +79,19 @@ class App:
 
     def on_loop(self):
         if not self.game_over:
-            if self.x >= self.screen_width or self.x < 0 or self.y >= self.screen_height or self.y < 0:
-                self.game_over = True
             self.x += self.x_change
             self.y += self.y_change
-            self.snake_list.append((self.x, self.y))
+            self.snake_list.append(pygame.Rect(self.x, self.y, App.snake_block, App.snake_block))
             if len(self.snake_list) > self.snake_length:
                 del self.snake_list[0]
             if self.x == self.foodx and self.y == self.foody:
-                print("Yummy!!")
+                # print("Yummy!!")
                 self.next_random_food()
                 self.snake_length += 1
+            if self.x >= self.screen_width or self.x < 0 or self.y >= self.screen_height or self.y < 0:
+                self.game_over = True
+            if self.hit_itself():
+                self.game_over = True
 
     def on_render(self):
         self.screen.fill(App.white)
@@ -117,17 +119,29 @@ class App:
 
     def message(self, msg, color):
         mesg = self.font.render(msg, True, color)
-        self.screen.blit(mesg, (10, self.screen_height // 2))
+        mesg_rect = mesg.get_rect(center=(self.screen_width // 2, self.screen_height // 2))
+        self.screen.blit(mesg, mesg_rect)
 
     def next_random_food(self):
-        self.foodx = random.randint(App.snake_block * 5, self.screen_width - App.snake_block * 5) // App.snake_block * App.snake_block
-        self.foody = random.randint(App.snake_block * 5, self.screen_height - App.snake_block * 5) // App.snake_block * App.snake_block
+        self.foodx = random.randint(App.snake_block * 5,
+                                    self.screen_width - App.snake_block * 5) // App.snake_block * App.snake_block
+        self.foody = random.randint(App.snake_block * 5,
+                                    self.screen_height - App.snake_block * 5) // App.snake_block * App.snake_block
 
     def draw_snake(self, head_color, body_color):
         head = self.snake_list[len(self.snake_list) - 1]
-        pygame.draw.rect(self.screen, head_color, (head[0], head[1], App.snake_block, App.snake_block))
+        pygame.draw.rect(self.screen, head_color, head)
         for x in self.snake_list[:-1]:
-            pygame.draw.rect(self.screen, body_color, (x[0], x[1], App.snake_block, App.snake_block))
+            pygame.draw.rect(self.screen, body_color, x)
+
+    def hit_itself(self):
+        head = self.snake_list[len(self.snake_list) - 1]
+        collide_index = head.collidelist(self.snake_list[:-1])
+        # print(collide_index)
+        if collide_index >= 0:
+            return True
+        else:
+            return False
 
 
 if __name__ == "__main__":
