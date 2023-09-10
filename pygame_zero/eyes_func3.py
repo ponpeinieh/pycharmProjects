@@ -1,3 +1,4 @@
+# both pupils point to mouse position with the center at the field center
 import pgzrun
 import math
 
@@ -18,27 +19,18 @@ theta = 0
 speed = 2
 def on_mouse_move(pos):
     global theta
-    #update theta
     try:
         theta = math.atan((pos[1]-center[1])/(pos[0]-center[0]))
     except:
         theta=0
     if pos[0]<center[0]:
         theta+=math.pi
-    update_pupil_positions(False)
-def update_theta():
-    global theta
-    theta = theta + math.pi
     update_pupil_positions()
-def update_pupil_positions(different=True):
+def update_pupil_positions():
     eye_1['pupil_x'] = eye_1['x']+pupil_position*math.cos(theta)
     eye_1['pupil_y'] = eye_1['y']+pupil_position*math.sin(theta)
-    if different:
-        eye_2['pupil_x'] = eye_2['x']+pupil_position*math.cos(-1*theta+math.pi)
-        eye_2['pupil_y'] = eye_2['y']+pupil_position*math.sin(-1*theta+math.pi)
-    else:
-        eye_2['pupil_x'] = eye_2['x']+pupil_position*math.cos(theta)
-        eye_2['pupil_y'] = eye_2['y']+pupil_position*math.sin(theta)
+    eye_2['pupil_x'] = eye_2['x']+pupil_position*math.cos(theta)
+    eye_2['pupil_y'] = eye_2['y']+pupil_position*math.sin(theta)
 def update():
     pass
     
@@ -48,5 +40,4 @@ def draw():
     screen.draw.filled_circle((eye_2['x'],eye_2['y']), eye_radius, color=white)
     screen.draw.filled_circle((eye_1['pupil_x'],eye_1['pupil_y']), pupil_radius, color=black)
     screen.draw.filled_circle((eye_2['pupil_x'],eye_2['pupil_y']), pupil_radius, color=black)
-#clock.schedule_interval(update_theta,1.0)   
 pgzrun.go()

@@ -1,3 +1,4 @@
+# use clock.schedule_xxx() function
 import pgzrun
 import math
 

@@ -1,3 +1,5 @@
+# both pupils point to mouse position with the center at each eye's center position
+# So we need to calculate the theta for each eye
 import pgzrun
 import math
 
